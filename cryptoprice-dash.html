@@ -1,13 +1,65 @@
 <link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+
 
 <dom-module id="cryptoprice-dash">
     <template>
         <h2>Hello world</h2>
+        <iron-ajax id="coinbase" handle-as="json" on-response="_handleResponse">
+        </iron-ajax>
     </template>
     <script>
         class CryptopriceDash extends Polymer.Element {
             static get is() {
                 return "cryptoprice-dash"
+            }
+            static get properties() {
+                return {
+                    currencies: {
+                        type: Array,
+                        value: [
+                            {
+                                code: 'BTC',
+                                name: 'Bitcoin'
+                            },
+                            {
+                                code: 'ETH',
+                                name: 'Ethereum'   
+                            },
+                            {
+                                code: 'LTC',
+                                name: 'Litecoin'
+                            },
+                            {
+                                code: 'BCH',
+                                name: 'Bitcoin Cash'
+                            }
+                        ]
+
+                    }
+                }
+            }
+            ready() {
+                super.ready();
+                Polymer.RenderStatus.afterNextRender(this, function() {
+                    this._getCurrencyData();
+                })
+            }
+            _getCurrencyData() {
+                //uses jquery
+                //calls the id of the iron ajax element above, this refers to element
+                var ajax = this.$.coinbase;
+                var currencies = this.currencies;
+                currencies.forEach(function(element) {
+                    ajax.url = 'https://api.coinbase.com/v2/prices/' +
+                    element.code + '-USD/spot';
+                     //this will trigger iron-ajax
+                     ajax.generateRequest();
+                }, this);      
+                    
+            }
+            _handleResponse(response) {
+                console.log(response);
             }
         }
         window.customElements.define(CryptopriceDash.is, CryptopriceDash);
