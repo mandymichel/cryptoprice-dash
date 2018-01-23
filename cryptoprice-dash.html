@@ -1,13 +1,20 @@
 <link rel="import" href="bower_components/polymer/polymer-element.html">
 <link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="bower_components/paper-spinner/paper-spinner-lite.html">
 
-
+<!--"this" is always referring to <cryptoprice-dash>, the custom element
+    being built in the dom module, which has a shadow root and maybe is the
+shadow dom. It's always elements getting functions called on them in this program -->
 <dom-module id="cryptoprice-dash">
     <template>
         <h2>Hello Cryptocurrencies</h2>
-        <iron-ajax id="coinbase" handle-as="json" on-response="_handleResponse">
+        <iron-ajax id="coinbase" handle-as="json" 
+        on-response="_handleResponse"
+        loading="{{loading}}">
         </iron-ajax>
-
+        <paper-spinner-lite active="[[loading]]"></paper-spinner-lite>
+        <!--Use $ to bind attribute to property-->
+        <div hidden$="[[loading]]">
         <!--Do it manually or with dom-repeat -->
         <template is="dom-repeat" items="[[currencies]]">
             <p>[[item.name]] - [[item.code]] - $[[item.price]]</p>
@@ -17,7 +24,7 @@
         <p>[[currencies.1.name]] - [[currencies.1.code]] - $[[currencies.1.price]]</p>
         <p>[[currencies.2.name]] - [[currencies.2.code]] - $[[currencies.2.price]]</p>
         <p>[[currencies.3.name]] - [[currencies.3.code]] - $[[currencies.3.price]]</p>
-
+    </div>
     </template>
     <script>
         class CryptopriceDash extends Polymer.Element {
@@ -51,6 +58,12 @@
                             }
                         ]
 
+                    },
+                    loading: {
+                        type: Boolean,
+                        //if notify is true, it is available for 2 way binding
+                        notify: true,
+                        value: false
                     }
                 }
             }
@@ -64,6 +77,7 @@
                 //uses jquery
                 //calls the id of the iron ajax element above, this refers to element
                 var ajax = this.$.coinbase;
+                console.log(ajax);
                 var currencies = this.currencies;
                 currencies.forEach(function(element) {
                     ajax.url = 'https://api.coinbase.com/v2/prices/' +
@@ -81,9 +95,11 @@
                 //returns the index from the object's code
                 //from the currencies array (0, 1, 2, 3)
                 var index = this.currencies.map(function (e) {
-                    return e.code; }).indexOf(code);
+                    return e.code; 
+                }).indexOf(code);
+                    
+                console.log(this);
                 this.set('currencies.' + index + '.price', data.response.data.amount);
-
             }
         }
         window.customElements.define(CryptopriceDash.is, CryptopriceDash);
