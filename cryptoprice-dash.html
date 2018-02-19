@@ -33,7 +33,7 @@ shadow dom. It's always elements getting functions called on them in this progra
     <script>
         class CryptopriceDash extends Polymer.Element {
             static get is() {
-                return "cryptoprice-dash"
+                return 'cryptoprice-dash'   
             }
             static get properties() {
                 return {
@@ -94,7 +94,8 @@ shadow dom. It's always elements getting functions called on them in this progra
                 }, this);
 
             }
-            _getCurrencyHistoricData(currency) {
+            _getCurrencyHistoricData(event) {
+                var currency = "";
                 if (event !== undefined) {
                     currency = event.target.dataset.item;
                 }
